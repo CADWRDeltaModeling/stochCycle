@@ -11,7 +11,7 @@ Description: Multiband implementation of the Higher Order Stochastic Cycle model
 License: Apache License (>= 2)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Depends: 
     R (>= 4.0)
 Imports: 
