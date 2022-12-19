@@ -68,12 +68,8 @@ sc_gibbs <- function(y,order_trend,order_cycle,freqs,regress,regress_lmr,regress
     if (regress_lmr) {  # offline
       y <- y - r_ylm2
     }
-    print("*=*=*=")
-    print("Offline regression")
-    print(summary(r_lm1))
+    print(summary(r_ylm2))
   }else{
-    print("*=*=*=")
-    print("No offline regression")
     r_lm1 <- NULL
   }
   miss <- is.na(y)

@@ -3,7 +3,6 @@
 # but the option isn't available in v09.
 
 library(stochCycle)
-library(signal)
 set.seed(13)
 order_trend <- 2
 order_cycle <- 4
@@ -140,61 +139,6 @@ M3 <- sc_freq[["M3"]]
 M4 <- sc_freq[["M4"]]
 
 
-
-rm_linear_phase<-function(result,freq,times){
-  if(is.null(dim(result))){
-    print("vec")
-    uresult <- unwrap(result)
-    nt <- length(result)
-    nsim = 1
-    inphase <- unwrap(times*freq)
-
-  }else{
-    uresult <- t(apply(result,1,unwrap))
-    nt <-  dim(uresult)[2]
-    nsim <- dim(uresult)[1]
-    inphase <- times*freq
-    inphase <- matrix(data=times*freq,nrow=nsim,ncol=nt,byrow=TRUE)
-  }
-  rmphase <- uresult - inphase
-  return(rmphase)
-}
-
-
-rm_linear_phase2<-function(result,freq,freqarg){
-  if(is.null(dim(result))){
-    print("vec")
-    uresult <- unwrap(result)
-    fresult <- unwrap(freqarg)
-    rmphase <- uresult - fresult
-    rmphase <- rmphase - median(rmphase) + freq
-    return(rmphase)
-
-  }else{
-    print(dim(result))
-    uresult <- apply(result,1,unwrap) # transposes so time is rows
-    fresult <- unwrap(freqarg)
-
-    #test <- uresult[1:1000,20] - fresult[1:1000]
-    #test <- test - mean(test)
-    #ts.plot(test)
-    #test <- test - mean(test) + freq[1:1000]
-
-    #lines(fresult+2.1,col="red")
-
-    #nsim <- dim(uresult)[1]
-
-    #nt <-  dim(uresult)[2]
-    #fresult <- matrix(data=uresult,nrow=nsim,ncol=nt,byrow=TRUE)
-    rmphase <- uresult - fresult
-    #ts.plot(rmphase[,20])
-    rmphase <- sweep(rmphase,2,apply(rmphase,2,median)) + freq
-    return(t(rmphase))
-  }
-}
-
-
-
 ts.plot(chirp[,"Qr"],xlim=c(3500,7500))
 lines(interp$subtide,col="red")
 ip1a <- aggregate_iter(sc_out$subtide_thinned)
@@ -207,11 +151,8 @@ archive = list(times=chirp[,"time"],
                subtide_postmean=ip1a,
                subtide25=ip1b[1,],subtide50 = ip1b[2,],subtide75= ip1b[3,])
 
-
-
-
-ip1a <- rm_linear_phase2(-interp$phase$M1[2:7682],chirp[,"D1_phase"],chirp[,"D1_phasearg"])
-ip1b <- rm_linear_phase2(-1*sc_out$phase_thinned$M1,chirp[,"D1_phase"],chirp[,"D1_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M1[2:7682],chirp[,"D1_phase"],chirp[,"D1_phasearg"])
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M1,chirp[,"D1_phase"],chirp[,"D1_phasearg"])
 ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
 ts.plot(ip1a,ylim=c(-1,1))
 lines(chirp[,"D1_phase"],col="red")
@@ -222,8 +163,8 @@ archive[['D1_phase_postmean']] <- ip1b
 
 
 
-ip1a <- rm_linear_phase2(-interp$phase$M2[2:7682],chirp[,"D2_phase"],chirp[,"D2_phasearg"])
-ip1b <- rm_linear_phase2(-1*sc_out$phase_thinned$M2[400,],chirp[,"D2_phase"],chirp[,"D2_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M2[2:7682],chirp[,"D2_phase"],chirp[,"D2_phasearg"])
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M2[400,],chirp[,"D2_phase"],chirp[,"D2_phasearg"])
 ts.plot(ip1a,ylim=c(0,0.5))
 lines(chirp[,"D2_phase"],col="red")
 lines(ip1b,col="green")
@@ -232,8 +173,8 @@ archive[['D2_phase_parm']] <- ip1a
 archive[['D2_phase_postmean']] <- ip1b
 
 
-ip1a <- rm_linear_phase2(-interp$phase$M3[2:7682],chirp[,"D3_phase"],chirp[,"D3_phasearg"])
-ip1b <- rm_linear_phase2(-1*sc_out$phase_thinned$M3,chirp[,"D3_phase"],chirp[,"D3_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M3[2:7682],chirp[,"D3_phase"],chirp[,"D3_phasearg"])
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M3,chirp[,"D3_phase"],chirp[,"D3_phasearg"])
 ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
 ts.plot(ip1a,ylim=c(0,1))
 lines(chirp[,"D3_phase"],col="red")
@@ -246,8 +187,8 @@ archive[['D3_phase_postmean']] <- ip1b
 
 
 
-ip1a <- rm_linear_phase2(-interp$phase$M4[2:7682],chirp[,"D4_phase"],chirp[,"D4_phasearg"])
-ip1b <- rm_linear_phase2(-1*sc_out$phase_thinned$M4,chirp[,"D4_phase"],chirp[,"D4_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M4[2:7682],chirp[,"D4_phase"],chirp[,"D4_phasearg"])
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M4,chirp[,"D4_phase"],chirp[,"D4_phasearg"])
 ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
 ts.plot(ip1a,ylim=c(0,0.8))
 lines(chirp[,"D4_phase"],col="red")

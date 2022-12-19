@@ -20,4 +20,5 @@ Imports:
     MASS,
     invgamma,
 	  lqmm,
+	  signal,
 	  yaml
