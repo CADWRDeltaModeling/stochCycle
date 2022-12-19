@@ -1,5 +1,4 @@
 # This is the SCHA(2,3) case in the paper
-# signal library used for its signal unwrapping function
 
 library(stochCycle)
 set.seed(15)
@@ -29,12 +28,9 @@ sc_names <- c("M1","M2","M3","M4")
 sc_freq <- tide_freqs[sc_names]
 
 # Combo for paper: 4,4,0.993, start with 1.35e-13 for both
-
 mc_iter <- 3001
 #select <- 5000:23000 #11000:29000 #3000:23000#1:1000
 regress_names <- c("K1","M2","O1","S2","Q1","N2","L2","M4","MK3","MO3") #,"M6","MK5")
-
-
 
 # prior for eps will be uniform
 rho_initial <- 0.995
@@ -94,17 +90,10 @@ lines(recon$full,col="red")
 interp <- interpret_state(modSmooth$s,order_trend,order_cycle,length(sc_freq),
                           flabels=sc_names)
 
-
 M1 <- sc_freq[["M1"]]
 M2 <- sc_freq[["M2"]]
 M3 <- sc_freq[["M3"]]
 M4 <- sc_freq[["M4"]]
-
-
-
-
-
-
 
 ts.plot(chirp[,"Qr"],xlim=c(3500,7500))
 lines(interp$subtide,col="red")
@@ -117,9 +106,6 @@ archive = list(times=chirp[,"time"],
                subtide=chirp[,"Qr"], subtide_parm=interp$subtide[2:7682],
                subtide_postmean=ip1a,
                subtide25=ip1b[1,],subtide50 = ip1b[2,],subtide75= ip1b[3,])
-
-
-
 
 ip1a <- rm_reference_phase(-interp$phase$M1[2:7682],chirp[,"D1_phase"],chirp[,"D1_phasearg"])
 ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M1,chirp[,"D1_phase"],chirp[,"D1_phasearg"])
@@ -247,8 +233,6 @@ archive[['D4_amp_postmean']] <- D4postmean
 archive[['D4_amp_25']] <- D4anal[1,]
 archive[['D4_amp_50']] <- D4anal[2,]
 archive[['D4_amp_75']] <- D4anal[3,]
-
-
 
 
 ts.plot(chirp[,"Qr"])

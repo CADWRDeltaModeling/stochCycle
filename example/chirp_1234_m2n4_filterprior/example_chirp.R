@@ -1,13 +1,10 @@
-# This example has been tested against v09_m2n4_lmr_roughh_zetaf_kappndv
-# It gives the same results for sigma2_zeta_fixed = FALSE when the prior is zero/improper
-# but the option isn't available in v09.
+# This is the SCHA(2,4) case in the paper
 
 library(stochCycle)
 set.seed(13)
 order_trend <- 2
 order_cycle <- 4
 chirp <- as.data.frame(jay_flinchem_chirptest())
-print(chirp)
 y <- chirp[,"D"]
 y <- y + 2.e-2*rnorm(length(y))
 
