@@ -148,10 +148,13 @@ archive = list(times=chirp[,"time"],
                subtide_postmean=ip1a,
                subtide25=ip1b[1,],subtide50 = ip1b[2,],subtide75= ip1b[3,])
 
-ip1a <- rm_reference_phase(-interp$phase$M1[2:7682],chirp[,"D1_phase"],chirp[,"D1_phasearg"])
-ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M1,chirp[,"D1_phase"],chirp[,"D1_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M1[2:7682],
+                           chirp[,"D1_phasearg"])+chirp[,"D1_phase"]
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M1,
+                           chirp[,"D1_phasearg"])
+ip1b <- sweep(ip1b,2,chirp[,"D1_phase"],"+")
 ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
-ts.plot(ip1a,ylim=c(-1,1))
+ts.plot(ip1a,ylim=c(-0.2,0.4))
 lines(chirp[,"D1_phase"],col="red")
 lines(ip1b,col="green")
 archive[['D1_phase']] <- chirp[,'D1_phase']
@@ -160,8 +163,12 @@ archive[['D1_phase_postmean']] <- ip1b
 
 
 
-ip1a <- rm_reference_phase(-interp$phase$M2[2:7682],chirp[,"D2_phase"],chirp[,"D2_phasearg"])
-ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M2[400,],chirp[,"D2_phase"],chirp[,"D2_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M2[2:7682],
+                           chirp[,"D2_phasearg"])+chirp[,"D2_phase"]
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M2,
+                           chirp[,"D2_phasearg"])
+ip1b <- sweep(ip1b,2,chirp[,"D2_phase"],"+")
+ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
 ts.plot(ip1a,ylim=c(0,0.5))
 lines(chirp[,"D2_phase"],col="red")
 lines(ip1b,col="green")
@@ -170,8 +177,11 @@ archive[['D2_phase_parm']] <- ip1a
 archive[['D2_phase_postmean']] <- ip1b
 
 
-ip1a <- rm_reference_phase(-interp$phase$M3[2:7682],chirp[,"D3_phase"],chirp[,"D3_phasearg"])
-ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M3,chirp[,"D3_phase"],chirp[,"D3_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M3[2:7682],
+                           chirp[,"D3_phasearg"]) +chirp[,"D3_phase"]
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M3,
+                           chirp[,"D3_phasearg"])
+ip1b <- sweep(ip1b,2,chirp[,"D3_phase"],"+")
 ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
 ts.plot(ip1a,ylim=c(0,1))
 lines(chirp[,"D3_phase"],col="red")
@@ -184,8 +194,11 @@ archive[['D3_phase_postmean']] <- ip1b
 
 
 
-ip1a <- rm_reference_phase(-interp$phase$M4[2:7682],chirp[,"D4_phase"],chirp[,"D4_phasearg"])
-ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M4,chirp[,"D4_phase"],chirp[,"D4_phasearg"])
+ip1a <- rm_reference_phase(-interp$phase$M4[2:7682],
+                           chirp[,"D4_phasearg"]) + chirp[,"D4_phase"]
+ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M4,
+                           chirp[,"D4_phasearg"])
+ip1b <- sweep(ip1b,2,chirp[,"D3_phase"],"+")
 ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
 ts.plot(ip1a,ylim=c(0,0.8))
 lines(chirp[,"D4_phase"],col="red")
