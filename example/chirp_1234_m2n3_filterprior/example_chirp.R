@@ -15,7 +15,6 @@ tide_freqs = tide_freq_radhr/samples_hr
 
 # this subsets approximately six months, minimal missing data
 # create some missing data
-
 ysave <- y
 select <- 1:length(y)
 
@@ -29,7 +28,6 @@ sc_freq <- tide_freqs[sc_names]
 
 # Combo for paper: 4,4,0.993, start with 1.35e-13 for both
 mc_iter <- 3001
-#select <- 5000:23000 #11000:29000 #3000:23000#1:1000
 regress_names <- c("K1","M2","O1","S2","Q1","N2","L2","M4","MK3","MO3") #,"M6","MK5")
 
 # prior for eps will be uniform
