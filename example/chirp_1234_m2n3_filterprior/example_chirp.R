@@ -1,6 +1,5 @@
-# This example has been tested against v09_m2n4_lmr_roughh_zetaf_kappndv
-# It gives the same results for sigma2_zeta_fixed = FALSE when the prior is zero/improper
-# but the option isn't available in v09.
+# This is the SCHA(2,3) case in the paper
+# signal library used for its signal unwrapping function
 
 library(stochCycle)
 library(signal)
