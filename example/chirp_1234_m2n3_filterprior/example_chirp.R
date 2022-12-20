@@ -26,7 +26,7 @@ regress_freq <- tide_freqs[regress_names]
 sc_names <- c("M1","M2","M3","M4")
 sc_freq <- tide_freqs[sc_names]
 
-# Combo for paper: 4,4,0.993, start with 1.35e-13 for both
+
 mc_iter <- 3001
 regress_names <- c("K1","M2","O1","S2","Q1","N2","L2","M4","MK3","MO3") #,"M6","MK5")
 
@@ -48,11 +48,7 @@ initial_sigma2_epsilon <- 4.e-4
 zeta_prior_shape=0.
 zeta_prior_rate <- 5e-5*zeta_prior_shape*0.
 
-# 0.005 or even 0.002 for experiment with narrow
-# 0.1 for (2,4) order and rho with prior in U(0.3, .999)
-# (0.15 worked for flow (3,3)
-mh_sd_rho <- 0.0001
-# For 2-3
+# For 2-4
 mh_sd_kappa <- 1.e-14
 mh_sd_zeta <- 8.e-8
 mh_sd_eps <- 1.e-5
@@ -60,11 +56,11 @@ initial_sigma2_zeta <- 2.e-07   # from successful 2-4 field example
 initial_sigma2_kappa <- 1.5e-13 # previously 1.35e-11 for 2-4
 
 #all_test_freq <- regular_filter_targets_more1()
-all_test_freq <- regular_filter_targets_23()
+all_test_freq <- regular_filter_targets_1thru4()
 test_freqs <-  all_test_freq$test_freqs
 test_targs <- all_test_freq$test_targets
-filter_scale <- 0.02 # 0.05 was good for 2-4 but not for 2-3
-max_rho <- 0.9985
+filter_scale <- 0.004
+max_rho <- 0.996
 
 
 sc_out <- sc_gibbs_filter_prior(y,order_trend,order_cycle,

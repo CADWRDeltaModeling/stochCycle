@@ -9,3 +9,9 @@ River Modulation
 
 Freeport:
 /freeport_m2n3gibbs_filterprior and /freeport_m2n4gibbs_filterprior
+
+
+Need to iron out parameter differences:
+rho_max 
+filter_scale
+

@@ -55,19 +55,19 @@ mh_sd_rho <- 0.0002
 mh_sd_kappa <- 5.e-13
 mh_sd_zeta <- 1.e-8
 mh_sd_eps <- 0.0001 # was 1e-6 not -5
-initial_rho <- 0.99
+initial_rho <- 0.995
 initial_sigma2_zeta <- 2.e-07   # from successful 2-4 field example
 initial_sigma2_kappa <- 1.35e-12 # previously 1.35e-11 for 2-4
 
-all_test_freq <- regular_filter_targets_23()
+all_test_freq <- regular_filter_targets_1thru4()
 test_freqs <-  all_test_freq$test_freqs
 test_targs <- all_test_freq$test_targets
-filter_scale <- 0.01 # 0.05 was good for 2-4 but not for 2-3
+filter_scale <- 0.004 # 0.05 was good for 2-4 but not for 2-3
 
 
 sigma2_diffuse <- 100. #
 thin_rate <- 5
-max_rho <- 0.9975
+max_rho <- 0.996
 
 sc_out <- sc_gibbs_filter_prior(y,order_trend,order_cycle,
           sc_freq,test_freqs,test_targs,filter_scale,samples_hr,

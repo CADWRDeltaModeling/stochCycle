@@ -26,19 +26,12 @@ regress_freq <- tide_freqs[regress_names]
 sc_names <- c("M1","M2","M3","M4")
 sc_freq <- tide_freqs[sc_names]
 
-# Combo for paper: 4,4,0.993, start with 1.35e-13 for both
 
 mc_iter <- 3001
-#select <- 5000:23000 #11000:29000 #3000:23000#1:1000
 regress_names <- c("K1","M2","O1","S2","Q1","N2","L2","M4","MK3","MO3") #,"M6","MK5")
 
-
-# 0.005 or even 0.002 for experiment with narrow
-# 0.1 for (2,4) order and rho with prior in U(0.3, .999)
-# (0.15 worked for flow (3,3)
-mh_sd_rho <- 0.001
 # prior for eps will be uniform
-rho_initial <- 0.99  # comes from a successful application in field example for 2-4
+rho_initial <- 0.993  # comes from a successful application in field example for 2-4
 # This enables an alternate prior that is concentrated at high values
 # It isn't parameterized yet
 use_rho_prior <- 0.
@@ -64,11 +57,11 @@ initial_sigma2_kappa <- 1.35e-13 # previously 1.35e-11 for 2-4
 
 
 #all_test_freq <- regular_filter_targets_more1()
-all_test_freq <- regular_filter_targets_23()
+all_test_freq <- regular_filter_targets_1thru4()
 test_freqs <-  all_test_freq$test_freqs
 test_targs <- all_test_freq$test_targets
-filter_scale <- 0.02 # 0.01 and 0.015 OK but led to underestimated eps
-max_rho <- 0.9975
+filter_scale <- 0.004 # 0.01 and 0.015 OK but led to underestimated eps
+max_rho <- 0.994
 
 
 sc_out <- sc_gibbs_filter_prior(y,order_trend,order_cycle,

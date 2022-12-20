@@ -85,7 +85,7 @@ mh_sd_epsilon <- 0.000005   #was 0.001
 
 
 #all_test_freq <- regular_filter_targets_24a()
-all_test_freq <- regular_filter_targets_1thru6() #todo changed this
+all_test_freq <- regular_filter_targets_1thru6()
 test_freqs <-  all_test_freq$test_freqs
 test_targs <- all_test_freq$test_targets
 filter_scale <- 0.004

@@ -296,6 +296,8 @@ regular_filter_targets_24b <- function(){
   out <- list(test_freqs=testfreqs,test_targets=test_targets)
 }
 
+
+
 #' Return a list of targets and frequencies that is good for D1-D2-D3-D4
 #' @return list of testing frequencies and ideal filter targets (0 or 1)
 #' @export
@@ -319,6 +321,67 @@ regular_filter_targets_1thru6 <- function(){
   test_targets[[7]] <- c(1.0,1.0,1.0,1.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.0,0.,0.0,0.0,0.0,0.0,0.0,0.,0.0,0.)
   out <- list(test_freqs=testfreqs,test_targets=test_targets)
 }
+
+
+#' Return a list of targets and frequencies that is good for D1-D2-D3-D4
+#' @return list of testing frequencies and ideal filter targets (0 or 1)
+#' @export
+regular_filter_targets_1thru4 <- function(){
+  # test frequencies in cpd for evaluation of log prior based on filter performance
+  testfreqs <- list()
+  test_targets <- list()
+  testfreqs[[1]] <-    c(0.35,0.4,0.45,0.96,0,98,1.0,1.02,1.04,1.06,1.08,1.15,1.65,2.0,3.0,4.0,5.0,6.0)
+  test_targets[[1]] <- c(0.00,0.0,0.00,1.00,1.00,1.0,1.00,1.00,1.00,1.00,1.00,0.00,0.0,0.0,0.0,0.0,0.0)
+  testfreqs[[2]] <-    c(0.5,1.,1.35,1.85,2.,2.15,2.65,3.,3.5,4.0,4.5)
+  test_targets[[2]] <- c(0.0,0.,0.00,1.00,1.,1.00,0.00,0.,0.,0.,0.)
+  testfreqs[[3]] <-    c(0.5,1.,2.0,2.35,2.85,3.,3.15,3.65,4.0,5.0)
+  test_targets[[3]] <- c(0.0,0.,0.0,0.00,1.00,1.,1.00,0.00,0.0,0.0)
+  testfreqs[[4]]    <- c(0.5,1.,2.0,3.0,3.35,3.85,4.0,4.15,4.35,)
+  test_targets[[4]] <- c(0.0,0.,0.0,0.0,0.00,1.00,1.0,1.00,0.00)
+  testfreqs[[5]] <-    c(0.1,0.2,0.3,0.4,0.94,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5,3.0,3.5,4.,4.5,5.0,5.5,6.0,6.5,7.,7.5,8.)
+  test_targets[[5]] <- c(1.0,1.0,1.0,1.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.0,0.0,0.,0.0,0.0,0.0,0.0,0.0,0.,0.0,0.)
+  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+}
+
+
+
+
+
+#' Return a list of targets and frequencies that is good for D1-D2-D3-D4-D5-D6-sub
+#' @return list of testing frequencies and ideal filter targets (0 or 1)
+#' @export
+regular_filter_targets_1thru6 <- function(){
+  # test frequencies in cpd for evaluation of log prior based on filter performance
+  testfreqs <- list()
+  test_targets <- list()
+  testfreqs[[1]] <-    c(0.35,0.4,0.45,0.96,0,98,1.0,1.02,1.04,1.06,1.08,1.15,1.65,2.0,3.0,4.0,5.0,6.0)
+  test_targets[[1]] <- c(0.00,0.0,0.00,1.00,1.00,1.0,1.00,1.00,1.00,1.00,1.00,0.00,0.0,0.0,0.0,0.0,0.0)
+  testfreqs[[2]] <-    c(0.5,1.,1.35,1.85,2.,2.15,2.65,3.,3.5,4.0,5.0,6.0)
+  test_targets[[2]] <- c(0.0,0.,0.00,1.00,1.,1.00,0.00,0.,0.0,0.0,0.0,0.0)
+  testfreqs[[3]] <-    c(0.5,1.,2.0,2.35,2.85,3.,3.15,3.65,4.0,5.0,6.0)
+  test_targets[[3]] <- c(0.0,0.,0.0,0.00,1.00,1.,1.00,0.00,0.0,0.0,0.0)
+  testfreqs[[4]]    <- c(0.5,1.,2.0,3.0,3.35,3.85,4.0,4.15,4.65,5.0,6.0)
+  test_targets[[4]] <- c(0.0,0.,0.0,0.0,0.00,1.00,1.0,1.00,0.00,0.0,0.0)
+  testfreqs[[5]] <-    c(0.5,1.,2.,3.,4.,4.35,5.,5.15,5.65,6.0)
+  test_targets[[5]] <- c(0.0,0.,0.,0.,0.,0.00,1.,1.00,0.00,0.0)
+  testfreqs[[6]] <-    c(0.5,1.,2.,3.,4.,5.,5.35,5.85,6.,6.15)
+  test_targets[[6]] <- c(0.0,0.,0.,0.,0.,0.,0.00,1.00,1.,1.00)
+  testfreqs[[7]] <-    c(0.1,0.2,0.3,0.4,0.94,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5,3.0,3.5,4.,4.5,5.0,5.5,6.0,6.5,7.,7.5,8.)
+  test_targets[[7]] <- c(1.0,1.0,1.0,1.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.0,0.0,0.,0.0,0.0,0.0,0.0,0.0,0.,0.0,0.)
+  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+}
+
+
+#' Return a list of targets and frequencies that is good for D1-D2-D3-D4-sub
+#' @return list of testing frequencies and ideal filter targets (0 or 1)
+#' @export
+regular_filter_targets_1thru4 <- function(){
+  one_six <- regular_filter_targets_1thru6()
+  testfreqs <- one_six$test_freqs[c(1,2,3,4,7)]
+  testtargets <- one_six$test_targets[c(1,2,3,4,7)]
+  out <- list(test_freqs=testfreqs,test_targets=testtargets)
+}
+
 
 
 #' Example of filter prior/loss function evaluation
