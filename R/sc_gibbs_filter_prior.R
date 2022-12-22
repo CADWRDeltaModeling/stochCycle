@@ -87,7 +87,7 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
 
   # derive parameters for calculating online regression posterior distribution
   # according to equation (14.5) in BDA book
-  t <- 1:length(select)   # time index
+  t <- 1:nobs   # time index
   X <- lapply(regress_freq, function(x) cbind(cos(x*t),sin((x*t))))
   X <- as.data.frame(X)
   Xfull <- as.matrix(X)
