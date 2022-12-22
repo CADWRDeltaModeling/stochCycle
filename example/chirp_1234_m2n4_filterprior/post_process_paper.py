@@ -59,11 +59,11 @@ ax0.annotate("Subtide",(0.88,0.8),xycoords='axes fraction')
 ax1.annotate("D1",(0.9,0.8),xycoords='axes fraction')
 ax2.annotate("D2",(0.9,0.8),xycoords='axes fraction')
 ax3.annotate("D3",(0.9,0.8),xycoords='axes fraction')
+ax3.set_ylim(0.,0.5)
 
 ax1.set_ylabel("Amplitude")
-#plt.tight_layout()
+plt.savefig("chirp_scha_24_amp.png")
 plt.show()
-
 
 fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(7,5))
 (180.*output.D1_phase/np.pi).plot(ax=ax1,label='Analytical',color='black')
@@ -81,9 +81,9 @@ ax1.set_xlim(0.,960.)
 ax1.annotate("D1",(0.9,0.8),xycoords='axes fraction')
 ax2.annotate("D2",(0.9,0.8),xycoords='axes fraction')
 ax3.annotate("D3",(0.9,0.8),xycoords='axes fraction')
-
 ax2.set_ylabel("Phase (degrees)")
 #plt.tight_layout()
+plt.savefig("chirp_scha_24_phase.png")
 plt.show()
 
 
