@@ -49,14 +49,13 @@ zeta_prior_shape=0.
 zeta_prior_rate <- 5e-5*zeta_prior_shape*0.
 
 # For 2-4
+mh_sd_rho <- 0.00005
 mh_sd_kappa <- 1.e-14
-mh_sd_zeta <- 1.e-7
-mh_sd_eps <- 0.00001
+mh_sd_zeta <- 5.e-8
+mh_sd_eps <- 0.000005
 initial_sigma2_zeta <- 2.e-07   # from successful 2-4 field example
 initial_sigma2_kappa <- 1.35e-13 # previously 1.35e-11 for 2-4
 
-
-#all_test_freq <- regular_filter_targets_more1()
 all_test_freq <- regular_filter_targets_1thru4()
 test_freqs <-  all_test_freq$test_freqs
 test_targs <- all_test_freq$test_targets

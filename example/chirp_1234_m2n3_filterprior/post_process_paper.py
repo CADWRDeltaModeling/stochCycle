@@ -60,8 +60,9 @@ ax3.annotate("D3",(0.9,0.8),xycoords='axes fraction')
 
 ax1.set_ylabel("Amplitude")
 #plt.tight_layout()
-plt.show()
 
+plt.savefig("chirp_scha_23_amp.png")
+plt.show()
 
 fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(7,5))
 (180.*output.D1_phase/np.pi).plot(ax=ax1,label='Analytical',color='black')
@@ -81,9 +82,9 @@ ax3.annotate("D3",(0.9,0.8),xycoords='axes fraction')
 
 ax2.set_ylabel("Phase (degrees)")
 #plt.tight_layout()
+
+plt.savefig("chirp_scha_23_phase.png")
 plt.show()
-
-
 
 
 
