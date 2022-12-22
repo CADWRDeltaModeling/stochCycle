@@ -122,7 +122,7 @@ hist(sc_out$sigma2_kappa[501:1000,6],xlab="Variance",ylab="",main=expression(kap
 
 scparams <- sc_params_from_gibbs(sc_out)
 fname <- "scha23_params.yaml"
-write_yaml(scparams,fname)
+yaml::write_yaml(scparams,fname)
 
 write.csv(format(df,digits=3,scientific=FALSE) ,file="sc23_result_summary.csv",quote=FALSE,row.names=FALSE)
 
