@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 """
 Created on Tue May 31 14:26:50 2022
 
@@ -41,12 +43,21 @@ def tropical_test_calc(B):
     y0 = D1_orig + A12*D1_orig*D2
     y1 = D1+D3
     
+    # Calculation based on quadratic interaction
+    print("version 0")
     y0 = D0 + D1_orig + D2 + A12*D1_orig*D2 + A22*D2*D2
     D0_change = 0.5*A22*A[2]*A[2]
-    y1 =   D0 + D0_change + D1 +D2 + D3 +  D4
-    y1 =   D0 + D1 +D2 + D3 +  D4
-    
     print(y0[0:15])
+
+
+    # Calculation based on expanded terms as shown in paper. This is consistent with the above 
+    # if consistent_quadratic == True, otherwise it is consistent up to the nonlinear D0 term
+    print("version 1")
+    consistent_quadratic=False
+    if consistent_quadratic: 
+        y1 =   D0 + D0_change + D1 +D2 + D3 +  D4
+    else:
+        y1 =   D0 + D1 +D2 + D3 +  D4    
     print(y1[0:15])
     
     noise = np.random.normal(scale=0.01,size=len(t))
@@ -63,10 +74,12 @@ def tropical_test_calc(B):
     plt.show()
     
     amplitudes = pd.DataFrame(index=t)
+    amplitudes["D0"] = D0
     amplitudes["D1"] = abs(mod*A1adj)
     amplitudes["D3"] = abs(mod*A[3])
     #df.plot()
-    
+    amplitudes.plot()
+    plt.show()
     
     wav = pywt.ContinuousWavelet(wspec)
     
@@ -111,10 +124,7 @@ def tropical_test_calc(B):
         
     amplitudes.plot()
     amplitudes.to_csv(f"cmor_{B}-0.96_result.csv")
-    #widths = np.array([6,8,12,25,49,99])
-    #cwtmatr = signal.cwt(res.values,signal.morelet,widths)
-    #plt.imshow(cwtmatr, extent=[-1, 1000, 5, 69], cmap='PRGn', aspect='auto',
-    #           vmax=abs(cwtmatr).max(), vmin=-abs(cwtmatr).max())  # doctest: +SKIP
+
 
 
 for B in [2.5,4,8]: tropical_test_calc(B)
