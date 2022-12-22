@@ -31,7 +31,7 @@ mc_iter <- 3001
 regress_names <- c("K1","M2","O1","S2","Q1","N2","L2","M4","MK3","MO3") #,"M6","MK5")
 
 # prior for eps will be uniform
-rho_initial <- 0.995
+
 # This enables an alternate prior that is concentrated at high values
 # It isn't parameterized yet
 use_rho_prior <- 0.
@@ -44,23 +44,26 @@ initial_sigma2_kappa <- 1.e-13 # previously 1.35e-11 for 2-4
 sigma2_diffuse <- 1. #
 thin_rate <- 5
 
-initial_sigma2_epsilon <- 4.e-4
+
 zeta_prior_shape=0.
 zeta_prior_rate <- 5e-5*zeta_prior_shape*0.
 
-# For 2-4
+# For 2-3
+mh_sd_rho <- 0.00001
 mh_sd_kappa <- 1.e-14
-mh_sd_zeta <- 8.e-8
-mh_sd_eps <- 1.e-5
-initial_sigma2_zeta <- 2.e-07   # from successful 2-4 field example
-initial_sigma2_kappa <- 1.5e-13 # previously 1.35e-11 for 2-4
+mh_sd_zeta <- 5.e-9
+mh_sd_eps <- 5.e-7
+rho_initial <- 0.9948
+initial_sigma2_epsilon <- 3.825e-5
+initial_sigma2_zeta <- 1.77e-07   # from successful 2-4 field example
+initial_sigma2_kappa <- c(2.6e-12,1.03e-11,1.03e-11,1.02e-11) # previously 1.35e-11 for 2-4
 
 #all_test_freq <- regular_filter_targets_more1()
 all_test_freq <- regular_filter_targets_1thru4()
 test_freqs <-  all_test_freq$test_freqs
 test_targs <- all_test_freq$test_targets
 filter_scale <- 0.004
-max_rho <- 0.996
+max_rho <- 0.995
 
 
 sc_out <- sc_gibbs_filter_prior(y,order_trend,order_cycle,
@@ -120,7 +123,7 @@ archive[['D1_phase_postmean']] <- ip1b
 ip1a <- rm_reference_phase(-interp$phase$M2[2:7682],
                            chirp[,"D2_phasearg"])+chirp[,"D2_phase"]
 ip1b <- rm_reference_phase(-1*sc_out$phase_thinned$M2,
-                           chirp[,"D2_phasearg"]) ]
+                           chirp[,"D2_phasearg"])
 ip1b <- sweep(ip1b,2,chirp[,"D2_phase"],"+")
 ip1b <- aggregate_iter(ip1b,is_angle=TRUE)
 ts.plot(ip1a,ylim=c(0,0.5))
