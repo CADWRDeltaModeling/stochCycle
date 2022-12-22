@@ -1,7 +1,3 @@
-# This example has been tested against v09_m2n4_lmr_roughh_zetaf_kappndv
-# It gives the same results for sigma2_zeta_fixed = FALSE when the prior is zero/improper
-# but the option isn't available in v09.
-
 library(stochCycle)
 
 
@@ -110,7 +106,7 @@ interp <- interpret_state(modSmooth$s,order_trend,order_cycle,length(sc_freq),
                           flabels=sc_names)
 # parms gives posterior mean estimates of parameters
 parms <- sc_params_from_gibbs(sc_out)
-write_yaml(parms,"scha_24_parms.yaml")
+yaml::write_yaml(parms,"scha_24_parms.yaml")
 write.csv(format(df,digits=3,scientific=FALSE) ,file="sc24_result_summary.csv",quote=FALSE,row.names=FALSE)
 
 
@@ -168,7 +164,7 @@ D2anal <- aggregate_iter(sc_out$amplitude_thinned$M2,nburn=-1)
 lines(D2anal,col="black")
 D3anal <- aggregate_iter(sc_out$amplitude_thinned$M3,nburn=-1)
 lines(D3anal,col="red")
-D4anal <- aggregate_iter(sc_out$amplitude_thinned$M4,nburn=-1s)
+D4anal <- aggregate_iter(sc_out$amplitude_thinned$M4,nburn=-1)
 lines(D4anal,col="green")
 
 

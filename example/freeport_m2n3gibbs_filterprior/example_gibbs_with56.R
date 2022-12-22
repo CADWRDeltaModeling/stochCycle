@@ -3,10 +3,6 @@
 # but the option isn't available in v09.
 
 library(stochCycle)
-#library(dlm)
-#library(invgamma)
-#library(MASS)
-#library(lqmm)
 
 CFS2CMS = 0.028316847
 # The data are loaded in a unit that is large (cubic feet per second)
@@ -52,29 +48,29 @@ max_rho <- 0.996
 
 
 
-mh_sd_rho <- 0.0005
+mh_sd_rho <- 0.0002
 mh_sd_kappa <- 1.e-13
 mh_sd_zeta <- 1.e-8
-mh_sd_eps <- 0.0001
+mh_sd_eps <- 0.00001
 initial_rho <- 0.995
-initial_sigma2_zeta <- 1.e-07   # from successful 2-4 field example
+initial_sigma2_zeta <- 1.e-08   # from successful 2-4 field example
 initial_sigma2_kappa <- 1.35e-13 # previously 1.35e-11 for 2-4
 initial_sigma2_epsilon <- 5.e-4
 
 
 # Restart
 initial_sigma2_epsilon <- 0.000432
-initial_sigma2_zeta <- 2.61204770568814e-07
+initial_sigma2_zeta <- 2.1e-07
 inital_rho <- 0.9959
 mh_sd_rho <- 0.00025
 if (TRUE){
-  initial_sigma2_kappa <- c(9.16612975355293e-12,1.64695960225735e-12,
-                            4.93130957772162e-12,1.92622404636635e-09,
-                            1.43410090920835e-13,1.48503967938336e-13)
+  initial_sigma2_kappa <- c(9.24e-12,1.697e-12,
+                            4.982e-12,2.04e-09,
+                            1.45e-13,1.47e-13)
 
   mh_sd_kappa <- c(5e-13,1e-13,1e-13,5e-11,5e-15,5e-15)
-  mh_sd_zeta <- 5.e-8
-  mh_sd_eps <- 0.00005
+  mh_sd_zeta <- 1.e-8
+  mh_sd_eps <- 0.00001
 
 }
 
