@@ -1,12 +1,9 @@
-# This example has been tested against v09_m2n4_lmr_roughh_zetaf_kappndv
+
+# Leftover# This example has been tested against v09_m2n4_lmr_roughh_zetaf_kappndv
 # It gives the same results for sigma2_zeta_fixed = FALSE when the prior is zero/improper
 # but the option isn't available in v09.
 
 library(stochCycle)
-#library(dlm)
-#library(invgamma)
-#library(MASS)
-#library(lqmm)
 
 CFS2CMS <- 0.028316847
 # The data are loaded in a unit that is large (cubic feet per second)
@@ -18,7 +15,7 @@ fpt <- fpt_input  #*CFS2CMS/100.
 samples_hr = 4. # data are 15min
 tide_freqs = tide_freq_radhr/samples_hr
 
-y <- fpt #[,1]
+y <- fpt
 
 
 regress_names <- c("K1","M2","O1","S2","Q1","N2","L2","M4","MK3","MO3")
@@ -33,7 +30,6 @@ regress_names <- c("K1","M2","O1","S2","Q1","N2","L2","M4","MK3","MO3") #,"M6","
 order_trend <- 2
 order_cycle <- 3
 
-# Leftover
 zeta_prior_shape=0.
 zeta_prior_rate <- 0.
 
@@ -47,17 +43,18 @@ sigma2_zeta_fixed <- FALSE   # previously not fixed
 #1 0.001 works for flow(3,3), becomes smaller 0.1 and (2,2)
 initial_sigma2_zeta <- 2.5e-07   # from successful 2-4 field example
 initial_sigma2_kappa <- 1.e-13 # previously 1.35e-11 for 2-4
-initial_sigma2_epsilon <- 1.e-3  #was e-6
+
 
 
 # For 2-3
-mh_sd_rho <- 0.0002
-mh_sd_kappa <- 5.e-13
-mh_sd_zeta <- 1.e-8
-mh_sd_eps <- 0.0001 # was 1e-6 not -5
-initial_rho <- 0.995
-initial_sigma2_zeta <- 2.e-07   # from successful 2-4 field example
-initial_sigma2_kappa <- 1.35e-12 # previously 1.35e-11 for 2-4
+mh_sd_rho <- 0.00001
+mh_sd_kappa <- c(1.e-14,1.e-12,1.e-12,1e-12)
+mh_sd_zeta <- 1.e-9
+mh_sd_eps <- 1.e-7
+initial_sigma2_epsilon <- 5.e-6  #was e-6
+initial_rho <- 0.9957
+initial_sigma2_zeta <- 1.89e-08   # from successful 2-4 field example
+initial_sigma2_kappa <- c(5.76e-13,1.31e-11,1.73e-11,7.74e-11)
 
 all_test_freq <- regular_filter_targets_1thru4()
 test_freqs <-  all_test_freq$test_freqs

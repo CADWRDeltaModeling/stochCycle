@@ -46,21 +46,15 @@ initial_sigma2_epsilon <- 1.e-3
 
 
 # For 2-4 original params
-mh_sd_rho <- 0.0002
+mh_sd_rho <- 0.000005
 mh_sd_kappa <- 1.e-14
-mh_sd_zeta <- 1.e-8
-mh_sd_eps <- 0.0001   #was s0.00
-initial_rho <- 0.993
-initial_sigma2_zeta <- 2.e-07   # from successful 2-4 field example
-initial_sigma2_kappa <- 1.35e-13 # previously 1.35e-11 for 2-4
+mh_sd_zeta <- 4.e-9
+mh_sd_eps <- 0.00001
+initial_sigma2_epsilon <- 5.e-4
+initial_rho <- 0.99399
+initial_sigma2_zeta <- 1.32e-07
+initial_sigma2_kappa <- c(1.375e-13,6.6e-13,6.7e-13,8.65e-13)
 
-# From chirp test
-#mh_sd_rho <- 0.00015
-#mh_sd_kappa <- 1.e-14
-#mh_sd_zeta <- 1.e-7
-#mh_sd_eps <- 0.00001
-#initial_sigma2_zeta <- 2.e-07
-#initial_sigma2_kappa <- 1.35e-13
 
 
 all_test_freq <- regular_filter_targets_1thru4()
@@ -84,7 +78,7 @@ mod <- sc_model_from_gibbs(sc_out)
 modFilt <- dlm::dlmFilter(y, mod)
 modSmooth <- dlm::dlmSmooth(modFilt)
 recon <- reconstruct_state(modSmooth$s,order_trend,order_cycle,4)
-do_plot(ysave,y,recon,500:2100)
+do_plot(y,y,recon,500:2100)
 interp <- interpret_state(modSmooth$s,order_trend,order_cycle,length(sc_freq),
                           flabels=sc_names)
 
