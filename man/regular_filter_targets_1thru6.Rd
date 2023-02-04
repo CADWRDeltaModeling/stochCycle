@@ -5,10 +5,16 @@
 \title{Return a list of targets and frequencies that is good for D1-D2-D3-D4}
 \usage{
 regular_filter_targets_1thru6()
+
+regular_filter_targets_1thru6()
 }
 \value{
+list of testing frequencies and ideal filter targets (0 or 1)
+
 list of testing frequencies and ideal filter targets (0 or 1)
 }
 \description{
 Return a list of targets and frequencies that is good for D1-D2-D3-D4
+
+Return a list of targets and frequencies that is good for D1-D2-D3-D4-D5-D6-sub
 }
