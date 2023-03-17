@@ -19,11 +19,6 @@ calculate_blocks <- function(ylen,foldsize=4*36,blocksize=1008,first=1,lastmax=-
     {
     starts <- seq(sblock,ylen,blocksize)
     ends <- starts + foldsize - 1
-    print("sblock")
-    print(sblock)
-    print("starts")
-    print(starts)
-    print(ends)
     iblock = iblock + 1
     mask <- c()
     for (istart in 1:length(starts)){
@@ -33,13 +28,11 @@ calculate_blocks <- function(ylen,foldsize=4*36,blocksize=1008,first=1,lastmax=-
     }
     allblocks[[iblock]] <- mask
     sblock <- sblock + foldsize
-    print(paste("sblock=",sblock))
   }
    allblocks
   }
 
-#4*36=144
-#1008 is number
+
 
 #' Calculate a list of blocks used for validation
 #'
@@ -54,7 +47,7 @@ calculate_blocks2 <- function(ylen,foldsize=4*36,blocksize=1008,first=1,lastmax=
 {
   sblock <- first
   nobs <- length(y)
-  if (lastmax<0) {lastmax=nobs}
+  if (lastmax<0) {lastmax=nobs+1+lastmax}
   print(nobs)
   allblocks <- list()
   iblock = 0
@@ -62,11 +55,6 @@ calculate_blocks2 <- function(ylen,foldsize=4*36,blocksize=1008,first=1,lastmax=
   {
     starts <- seq(sblock,ylen,blocksize)
     ends <- starts + foldsize - 1
-    print("sblock")
-    print(sblock)
-    print("starts")
-    print(starts)
-    print(ends)
     iblock = iblock + 1
     mask <- c()
     for (istart in 1:length(starts)){
@@ -76,7 +64,6 @@ calculate_blocks2 <- function(ylen,foldsize=4*36,blocksize=1008,first=1,lastmax=
     }
     allblocks[[iblock]] <- mask
     sblock <- sblock + foldsize
-    print(paste("sblock=",sblock))
   }
   allblocks
 }
