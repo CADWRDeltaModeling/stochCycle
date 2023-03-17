@@ -110,7 +110,7 @@ plot_gain<- function(sc_freq,m,n,rho,qzeta,qkappa,nsample){
 
 #' Evaluate improper prior representing filter quality
 #'
-#' @param test_freqs list of frequencies at which filter quality is to be eval'd
+#' @param filter_prior_freqs list of frequencies at which filter quality is to be eval'd
 #' @param test_targets ideal gain at test freqs (1 or 0)
 #' @param scale scale of penalty. The smaller, the less forgiving
 #' @param sc_freq list of frequencies for cycles
@@ -121,16 +121,16 @@ plot_gain<- function(sc_freq,m,n,rho,qzeta,qkappa,nsample){
 #' @param qkappa variance of cycle divided by variance of observation
 #' @return cost function evaluated
 #' @export
-filter_prior <- function(test_freqs,test_targets,scale,
+filter_prior <- function(filter_prior_freqs,test_targets,scale,
                          sc_freq,m,n,rho,qzeta,qkappa){
   nfreq <- length(sc_freq)
   if (is.atomic(qkappa)){qkappa<-rep(qkappa,nfreq)}
   #print(paste("cost eval scale=",scale,"rho=",rho,"qzeta=",qzeta,
   #            "qkappa=",qkappa[1],qkappa[2],qkappa[3],qkappa[4],
-  #             "number of test freqs:",length(test_freqs)))
+  #             "number of test freqs:",length(filter_prior_freqs)))
   cost <- 0.
-  for (ii in 1:length(test_freqs)){
-    tester <- test_freqs[[ii]]
+  for (ii in 1:length(filter_prior_freqs)){
+    tester <- filter_prior_freqs[[ii]]
     target <- test_targets[[ii]]
     trad_per_hr <- 2*pi*tester/24.
     sd <- calculate_gain(trad_per_hr,sc_freq,m,n,rho,qzeta,qkappa)
@@ -172,7 +172,7 @@ sparse_filter_targets <- function(){
   test_targets[[4]] <- c(0.,0.,0.,0.,1.,1.,1.,0.)
   testfreqs[[5]] <- c(0.1,0.2,0.3,0.4,0.45,0.5,0.525,0.9,0.95,1.0,1.05,1.95,2.)
   test_targets[[5]] <- c(1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 #' Return a list of targets and frequencies that is good for D1-D2-D3-D4
@@ -192,7 +192,7 @@ regular_filter_targets <- function(){
   test_targets[[4]] <- c(0.,0.,0.,0.,1.,1.,1.)
   testfreqs[[5]] <- c(0.1,0.2,0.3,0.4,0.45,0.5,0.525,0.55,0.9,0.93,0.96,1.0,1.04,1.08,1.5,2.,2.5)
   test_targets[[5]] <- c(1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 #' Return a list of targets and frequencies that is good for D1-D2-D3-D4
@@ -212,7 +212,7 @@ regular_filter_targets_more1 <- function(){
   test_targets[[4]] <- c(0.,0.,0.,0.,1.,1.,1.)
   testfreqs[[5]] <- c(0.1,0.2,0.3,0.35,0.9,0.93,0.96,1.0,1.04,1.08,1.85,1.95)
   test_targets[[5]] <- c(1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 #' Return a list of targets and frequencies that is good for D1-D2-D3-D4
@@ -232,7 +232,7 @@ regular_filter_targets_more1b <- function(){
   test_targets[[4]] <- c(0.,0.,0.,0.,1.,1.,1.)
   testfreqs[[5]] <- c(0.1,0.2,0.3,0.35,0.93,0.96,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95)
   test_targets[[5]] <- c(1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 
@@ -253,7 +253,7 @@ regular_filter_targets_23 <- function(){
   test_targets[[4]] <- c(0.,0.,0.,0.,1.,1.,1.)
   testfreqs[[5]] <- c(0.1,0.2,0.3,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5)
   test_targets[[5]] <- c(1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 #' Return a list of targets and frequencies that is good for D1-D2-D3-D4
@@ -273,7 +273,7 @@ regular_filter_targets_23b <- function(){
   test_targets[[4]] <- c(0.,0.,0.,0.,1.,1.,1.)
   testfreqs[[5]] <- c(0.1,0.2,0.3,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5,7.5)
   test_targets[[5]] <- c(1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 #' Return a list of targets and frequencies that is good for D1-D2-D3-D4
@@ -293,7 +293,7 @@ regular_filter_targets_24b <- function(){
   test_targets[[4]] <- c(0.,0.,0.,0.,1.,1.,1.)
   testfreqs[[5]] <- c(0.1,0.2,0.3,0.4,0.94,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5,3.5,4.,4.5,5.0,5.5,6.0,6.5,7.,7.5,8.)
   test_targets[[5]] <- c(1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.0,0.0,0.0,0.,0.,0.,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 
@@ -319,7 +319,7 @@ regular_filter_targets_1thru6 <- function(){
   test_targets[[6]] <- c(0.0,0.,0.,0.,0.,0.,1.)
   testfreqs[[7]] <-    c(0.1,0.2,0.3,0.4,0.94,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5,3.5,4.,4.5,5.0,5.5,6.0,6.5,7.,7.5,8.)
   test_targets[[7]] <- c(1.0,1.0,1.0,1.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.0,0.,0.0,0.0,0.0,0.0,0.0,0.,0.0,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 
@@ -340,7 +340,7 @@ regular_filter_targets_1thru4 <- function(){
   test_targets[[4]] <- c(0.0,0.,0.0,0.0,0.00,1.00,1.0,1.00,0.00)
   testfreqs[[5]] <-    c(0.1,0.2,0.3,0.4,0.94,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5,3.0,3.5,4.,4.5,5.0,5.5,6.0,6.5,7.,7.5,8.)
   test_targets[[5]] <- c(1.0,1.0,1.0,1.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.0,0.0,0.,0.0,0.0,0.0,0.0,0.0,0.,0.0,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 
@@ -368,7 +368,7 @@ regular_filter_targets_1thru6 <- function(){
   test_targets[[6]] <- c(0.0,0.,0.,0.,0.,0.,0.00,1.00,1.,1.00)
   testfreqs[[7]] <-    c(0.1,0.2,0.3,0.4,0.94,0.96,0.98,1.0,1.04,1.08,1.45,1.5,1.55,1.85,1.95,2.5,3.0,3.5,4.,4.5,5.0,5.5,6.0,6.5,7.,7.5,8.)
   test_targets[[7]] <- c(1.0,1.0,1.0,1.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.00,0.00,0.00,0.0,0.0,0.0,0.,0.0,0.0,0.0,0.0,0.0,0.,0.0,0.)
-  out <- list(test_freqs=testfreqs,test_targets=test_targets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=test_targets)
 }
 
 
@@ -377,9 +377,9 @@ regular_filter_targets_1thru6 <- function(){
 #' @export
 regular_filter_targets_1thru4 <- function(){
   one_six <- regular_filter_targets_1thru6()
-  testfreqs <- one_six$test_freqs[c(1,2,3,4,7)]
+  testfreqs <- one_six$filter_prior_freqs[c(1,2,3,4,7)]
   testtargets <- one_six$test_targets[c(1,2,3,4,7)]
-  out <- list(test_freqs=testfreqs,test_targets=testtargets)
+  out <- list(filter_prior_freqs=testfreqs,test_targets=testtargets)
 }
 
 
@@ -400,7 +400,7 @@ example_filter <- function(eps,zeta,kappa,rho,m=2,n=4,scale=0.001,nsample=2400){
   # test frequencies for evaluation of log prior based on filter performance
   alltargs <-regular_filter_targets()
   ttargets <- alltargs$test_targets
-  testfreqs <- alltargs$test_freqs
+  testfreqs <- alltargs$filter_prior_freqs
 
   plot_gain(sc_freq,m,n,rho,qzeta,qkappa,nsample)
   cost <-filter_prior(testfreqs,ttargets,scale,
