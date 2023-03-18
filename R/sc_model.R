@@ -18,13 +18,7 @@ sc_model_mat <- function(order_trend,order_cycle,freqs,rho,trend_scale=1.)
   nfreq <- length(freq_used)
   nstate <- order_trend + 2*order_cycle*nfreq
 
-  print(paste("number of frequencies=",nfreq))
-  print(paste("order of trend=",order_trend))
-  print(paste("order of cycle=",order_cycle))
-  print(paste('number of state=',nstate))
-
   # Construct observation matrix FF
-
   obs_trend <- c(trend_scale,rep(0,order_trend-1))
   obs_per_freq <- c(1,0,rep(0,2*(order_cycle-1)))
   FF <- t(as.matrix(c(obs_trend, rep(obs_per_freq,nfreq))))
@@ -104,8 +98,7 @@ calc_ct_sum <- function(order_trend, order_cycle, nth_freq, lambda, rho, n, alph
 #' Shape parameter for the posterior distribution of kappa
 #' according to equation (23) in Harvey's paper (2005). This is the sums of two
 #' components, one from the unconditional covariance and the other from the sum of
-#' squared residuals from the state equation. Beware this may be not exactly what this
-#' function does
+#' squared residuals from the state equation.
 #' @param order_trend order of the trend part of the model
 #' @param order_cycle order of cycle part of model, assumed same for all freqs
 #' @param nth_freq index of frequency being queried
@@ -128,6 +121,28 @@ cal_shape_kappa <- function(order_trend, order_cycle, nth_freq, lambda, rho,
   return (shape_kappa[1,1])   # the size is already 1x1, this just converts to scalar
 }
 
+#' Shape parameter for the posterior distribution of kappa
+#' according to equation (23) in Harvey's paper (2005). This is the sums of two
+#' components, one from the unconditional covariance and the other from the sum of
+#' squared residuals from the state equation.
+#' @param order_trend order of the trend part of the model
+#' @param order_cycle order of cycle part of model, assumed same for all freqs
+#' @param nth_freq index of frequency being queried
+#' @param lambda frequency
+#' @param rho dampening factor
+#' @param covar_matrix_inv inverse of the covariance matrix (exactly?)
+#' @return shape_kappa the shape function
+#' @export
+cal_shape_kappa_diffuse <- function(order_trend, order_cycle, nth_freq, lambda, rho,
+                            covar_matrix_inv, n, alpha_draw) {
+  ct_sum <- calc_ct_sum(order_trend, order_cycle, nth_freq, lambda, rho, n, alpha_draw)
+  shape_kappa=ct_sum
+  return(ct_sum)  # the size is already 1x1, this just converts to scalar
+}
+
+
+
+
 #' Calculate the filter lengths empirically using a unit impulse
 #' @param order_trend Order of the trend (low pass) component
 #' @param order_cycle Order of the cyclical component, same for all frequencies
@@ -138,14 +153,15 @@ cal_shape_kappa <- function(order_trend, order_cycle, nth_freq, lambda, rho,
 #' @param sigma2_kappa variance of cycle disturbances
 #' @return list of approximate trend extraction filter lengths (2*sigma)
 #' @export
-sc_model_build <- function(order_trend,order_cycle,freqs,rho,sigma2_eps,sigma2_zeta,sigma2_kappa)
+sc_model_build <- function(order_trend,order_cycle,freqs,rho,sigma2_eps,sigma2_zeta,
+                           sigma2_kappa,sigma2_diffuse)
 {
   nstate <- 2*order_cycle*length(freqs) + order_trend
-  sigma2_diffuse <- 1.e7
 
   print(freqs)
   # prepare data for dlm with trend and cycle (Harvey 2005 paper)
   n_freq <- length(freqs)
+
   scmat <- sc_model_mat(order_trend, order_cycle, freqs, rho)
 
   # V is observation error, 1x1
@@ -161,15 +177,18 @@ sc_model_build <- function(order_trend,order_cycle,freqs,rho,sigma2_eps,sigma2_z
   W <- diag(c(Wtrend,Wcycle))
   m0_full <- rep(0, nstate)
 
-
   C0_trend <- diag(1,order_trend)*sigma2_diffuse
-  covar <- list()
-  for (jj in (1:n_freq)) {
-    covar[[jj]] <- calc_cycle_covariance_matrix(order_cycle,rho,freqs[jj])*sigma2_kappa[jj]
+  if (rho == 1.){
+    C0_cycle <- diag(1.,2*order_cycle*n_freq)*sigma2_diffuse
+  }else{
+    covar <- list()
+    for (jj in (1:n_freq)) {
+      covar[[jj]] <- calc_cycle_covariance_matrix(order_cycle,rho,freqs[jj])*sigma2_kappa[jj]
+    }
+    C0_cycle <-  dlm::bdiag(covar)
   }
-  C0_cycle <-  dlm::bdiag(covar)
-  C0_full <- dlm::bdiag(C0_trend,C0_cycle)
 
+  C0_full <- dlm::bdiag(C0_trend,C0_cycle)
 
   model <- dlm::dlm(FF=scmat$FF,V=V,GG=scmat$GG,W=W,m0=m0_full,C0=C0_full)
 
