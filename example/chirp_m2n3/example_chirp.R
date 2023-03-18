@@ -27,11 +27,11 @@ initial_sigma2_kappa=1.35e-13
 
 
 sc_out <- sc_gibbs(y,order_trend,order_cycle,sc_freq,mc_iter,
-                   rho_fixed = rho_fixed,initial_rho=initial_rho,
                    initial_sigma2_epsilon=0.004,
+                   rho_fixed = rho_fixed,initial_rho=initial_rho,
                    sigma2_zeta_fixed=sigma2_zeta_fixed,
                    initial_sigma2_zeta=initial_sigma2_zeta,
-                   initial_sigma2_kappa)
+                   initial_sigma2_kappa=initial_sigma2_kappa)
 
 
 
