@@ -1,125 +1,88 @@
-# Version 8
-# Collected all rho into one parameter so they could not vary against one another
-# Version 9? Small improvements
-# Version 10
-# Pooled all the sigma2_kappa together
 
 
-# This script is developed to perform MCMC calculation for tidal analysis with trend and
-# cycle (stationary and non-stationary) components.
-# The unknown paramenters to be estimated include regression coefficients and
-# variances for observation (sigma2_epsilon), trend (sigma2_zeta), and cycles (sigma2_kappa).
-# rho and freqs of individual cycles are treated as know in this case.
-# This script is developed by Rueen-Fang based on Eli's script "scha_basic.01.R."
-
-
-
-#' Fit MCMC/Gibbs model
-#' Mostly fits the Harvey and Trimbur model, except as noted here where some
-#' parameters are more constrained
+#' Fit MCMC/Gibbs model using the Harvey and Trimbur model with known frequency
 #' @param y The observed data
 #' @param order_trend order of the trend (low pass) component of the model
 #' @param order_cycle order of the cyclical part of the model
 #' @param freqs frequencies used in fitting
-#' @param test_freqs filter quality test freqs in cpd
+#' @param samples_per_hr number of obs per hour
+#' @param mc_iter number of iterations
+#' @param filter_prior_freqs filter quality test freqs in cpd
 #' @param test_targets filter quality test targets (gain)
 #' @param filter_scale scale of loss/prior on bad filter fit to freqs/targets
-#' @param samples_per_hr number of obs per hour
-#' @param regress use regression?
-#' @param regress_lmr use offline regression?
-#' @param regress_freq regression frequencies
-#' @param use_rho_prior whether to use a prior for rho (multiplied by uniform prior)
-#' @param rho_initial starting rho
-#' @param max_rho top of the uniform prior, often guided by conditioning of problem
-#' @param mh_sd_rho Metropolis Hastings random walk std. deviation for rho
-#' @param sigma2_zeta_fixed fixed value or anything <0 if disabled
-#' @param zeta_prior_rate a
-#' @param zeta_prior_shape b
+#' @param initial_sigma2_epsilon initial MCMC iterate for sigma2_epsilon
+#' @param mh_sd_eps Metropolis Hastings random walk std. deviation for sigma2_epsilon
+#' @param sigma2_zeta_fixed is sigma_zeta_fixed (and thus out of MCMC)?
+#' @param sigma2_diffuse magnitude for diffuse initial condition
+#' @param initial_sigma2_zeta initial MCMC value for sigma2_zeta
 #' @param mh_sd_zeta Metropolis Hastings random walk std. deviation for zeta
-#' @param initial_sigma2_zeta c
 #' @param initial_sigma2_kappa initial variance for kappa, either scalar or one per freq
 #' @param mh_sd_kappa Metropolis Hastings random walk std. deviation for kappa, either scalar or one per freq
-#' @param sigma2_diffuse magnitude for diffuse initial condition
-#' @param mc_iter number of iterations
+#' @param rho_fixed is rho fixed (and thus out of MCMC)
+#' @param initial_rho starting rho
+#' @param rho_high top of the uniform prior, often guided by conditioning of problem
+#' @param rho_low bottom of the uniform prior, often guided by need for neat partiion
+#' @param mh_sd_rho Metropolis Hastings random walk std. deviation for rho
 #' @param thin_rate thinning rate for posterior draws (every thin_rate sample is used)
 #' @export
-sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
-                     freqs,test_freqs,test_targets,filter_scale,samples_per_hr,
-                     regress,regress_lmr,regress_freq,
-                     initial_sigma2_epsilon,use_rho_prior,rho_initial,mh_sd_rho,max_rho,
-                     sigma2_zeta_fixed,zeta_prior_rate,zeta_prior_shape,mh_sd_zeta,mh_sd_eps,
-                     initial_sigma2_zeta,initial_sigma2_kappa,mh_sd_kappa,sigma2_diffuse,
-                     mc_iter,thin_rate)
+sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,freqs,samples_per_hr,
+                                  mc_iter,
+                                  filter_prior_freqs,test_targets,filter_scale,
+                                  initial_sigma2_epsilon=1.e-4,mh_sd_eps=NULL,
+                                  sigma2_zeta_fixed=FALSE,sigma2_diffuse=1.e4,
+                                  initial_sigma2_zeta=1.e-6,mh_sd_zeta=NULL,
+                                  initial_sigma2_kappa=1.e-11,mh_sd_kappa=NULL,
+                                  rho_fixed=FALSE,initial_rho=0.9925,
+                                  rho_low=0.985,
+                                  rho_high=0.9925,
+                                  mh_sd_rho=NULL,
+                                  thin_rate=5)
 {
+
 
   # Preliminaries constructing model and doing regression if it is offline
   nobs <- length(y) # total length of obs data, as T in the equation
   miss <- is.na(y)
-
   ygood <- y[!miss]
   ngood <- length(ygood)
 
-  # simple linear regression
-  # the offline regression is done offline for either regression case, but
-  # won't be applied if it is done online
-  if (regress || regress_lmr){
-    if (regress && regress_lmr) stop("Args regress and regress_lmr are mutually exclusive")
-    r_t <- 1:length(y)
-    r_X <- lapply(regress_freq, function(x) cbind(cos(x*r_t),sin((x*r_t))))
-    r_X <- as.data.frame(r_X)
-    # todo: this is hardwired
-    #r_lm1 <- lm(y ~ 1+K1.1+K1.2+M2.1+M2.2+O1.1+O1.2+S2.1+S2.2+Q1.1+Q1.2+N2.1+N2.2+L2.1+L2.2+M4.1+M4.2+MK3.1+MK3.2+MO3.1+MO3.2,na.action=na.exclude,data=r_X)
-    r_lm1 <- lm(y ~ 1+K1.1+K1.2+M2.1+M2.2+O1.1+O1.2,na.action=na.exclude,data=r_X)
-    r_yres <- residuals(r_lm1)
-    r_ylm <- predict(r_lm1,as.data.frame(r_X))
-    r_ylm2 <- fitted(r_lm1) #,as.data.frame(r_X))
-    if (regress_lmr) {  # offline
-      y <- y - r_ylm2
-    }
-    print(summary(r_ylm2))
-  }else{
-    r_lm1 <- NULL
+  # Set Metropolis Hastings jump std. deviation if not provided
+  if (is.null(mh_sd_eps)){
+    mh_sd_eps = initial_sigma2_epsilon/15.
   }
-  miss <- is.na(y)
-  ygood <- y[!miss]
-  ngood <- length(ygood)
+  if (is.null(mh_sd_zeta)){
+    mh_sd_zeta = initial_sigma2_zeta/15.
+  }
+  if (is.null(mh_sd_kappa)){
+    mh_sd_kappa = initial_sigma2_kappa/15.
+  }
+  if (is.null(mh_sd_rho)){
+    mh_sd_rho = initial_rho/15.
+  }
 
-
-  # derive parameters for calculating online regression posterior distribution
-  # according to equation (14.5) in BDA book
-  t <- 1:nobs   # time index
-  X <- lapply(regress_freq, function(x) cbind(cos(x*t),sin((x*t))))
-  X <- as.data.frame(X)
-  Xfull <- as.matrix(X)
-  X <- Xfull[!miss,]
-  k <- length(regress_freq)*2
-
-  var_beta <- solve(t(X)%*%X)  #equation (BDA 14.6)
-  mean_beta_multiplier <- var_beta %*% t(X)  # equation (14.5)
-
-  # prepare data for dlm with trend and cycle (Harvey 2005 paper)
   n_freq <- length(freqs)
+  # todo: this seems not parallel to the sc_gibbs function
   sc_freq <- freqs*samples_per_hr
-  rho <-  rho_initial
+  rho <-  initial_rho
   scmat <- sc_model_mat(order_trend, order_cycle, freqs, rho)
 
-  # V is observation error, 1x1
   V <- diag(c(1))
 
   # W is state innovation variance,
   Wtrend <- c(rep(0.,order_trend-1),1.)*initial_sigma2_zeta
   if (length(initial_sigma2_kappa) == 1){
     initial_sigma2_kappa <- rep(initial_sigma2_kappa,n_freq)
-    Wcycle <- rep( c(rep(0,2*(order_cycle-1)),1,1),n_freq)*initial_sigma2_kappa
   }
+  # todo: Moved this out of brackets above because it seemed wrong
+  # does this work for length > 1 and ==1 ?
+  Wcycle <- rep( c(rep(0,2*(order_cycle-1)),1,1),n_freq)*initial_sigma2_kappa
+
   if(length(mh_sd_kappa)==1){
     mh_sd_kappa = rep(mh_sd_kappa,n_freq)
   }
 
   mat_zero <- matrix(0, ncol = n_freq, nrow = 2*(order_cycle-1))
   Wcycle <- as.vector(matrix( rbind(mat_zero,initial_sigma2_kappa,initial_sigma2_kappa),byrow=TRUE))
-  print("Initial Wcycle as vector is")
-  print(Wcycle)
 
   W <- diag(c(Wtrend,Wcycle))
 
@@ -145,12 +108,12 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
     covar_matrix_multiplied[[jj]] <- covar_matrix_cycle[[jj]]*initial_sigma2_kappa[[jj]]
   }
 
+  # Initial condition for the state is zero but evolves (check this)
   m0 <- rep(0, dim(W)[1])
   m0[1] <- 0.
 
   # Uninformative C0
   C0_trend <- diag(1,order_trend)*sigma2_diffuse
-  # Ncovar
 
   C0_cycle <- dlm::bdiag(covar_matrix_multiplied)
   C0 <- dlm::bdiag(C0_trend, C0_cycle)
@@ -158,30 +121,34 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
 
   # begin MCMC/Gibbs' sampling iteration
   print (paste('Start MCMC',date()))
-  print (paste('mc_iter =',mc_iter))
+  print (paste('Requested # MCMC iterations (mc_iter) =',mc_iter))
   flush.console()
 
-  beta_draw_save <- matrix(numeric(mc_iter*k), nrow = mc_iter, ncol = k) # todo: removed intercept so k not k+1
+  # These are for logging samples obtained during MCMC process
+  #beta_draw_save <- matrix(numeric(mc_iter*k), nrow = mc_iter, ncol = k) # todo: removed intercept so k not k+1
   sigma2_epsilon_save <- numeric(mc_iter)
   sigma2_kappa_save <- matrix(numeric(mc_iter*n_freq), nrow = mc_iter, ncol = n_freq)
   sigma2_zeta_save <- numeric(mc_iter)
   rho_save <- matrix(numeric(mc_iter),nrow=mc_iter,ncol=1)
-  accept_reject <- list(eps=c(0,0),zeta=c(0,0),kappa=c(0,0),rho=c(0,0))
+  accept_reject <- list(eps=c(0,0),zeta=c(0,0),
+                        kappa=lapply(freqs,function(x){c(0,0)}),rho=c(0,0))
   subtide_thinned <- c()
   amplitudes_thinned <- list()
   phase_thinned <- list()
   freq_thinned <- list()
-  harmonic_thinned <- c()
   state_thinned <- c()
 
   alltargs <- regular_filter_targets()
-  testfreqs <- alltargs$test_freqs
+  testfreqs <- alltargs$filter_prior_freqs
   test_targets <- alltargs$test_targets
 
 
   sigma2_zeta <- initial_sigma2_zeta
   sigma2_kappa <- rep(initial_sigma2_kappa,n_freq)
   sigma2_eps_draw <- initial_sigma2_epsilon
+
+
+
 
   set.seed(201)
   for (itr in(1:mc_iter)) {
@@ -190,37 +157,18 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
 
     #step 1 - sample beta (normal) and sigma2 (inverse gamma)
     if (itr==1) {
-      y_mod <- y - mean(y,na.rm=TRUE)
+      # todo, eliminated the mean subtraction
+      y_mod <- y # - mean(y,na.rm=TRUE)
     } else {
       state_part <-alpha_draw %*% t(model$FF)
       y_mod <- y - state_part
     }
 
-    # Eq (14.4) in BDA book. This is the regression
-    if (regress ){
-      if (itr>=0) {
-        mean_beta <- mean_beta_multiplier %*% y_mod[!miss]
-      }
-      # todo: special treamtment
-      print("beta[1:6]")
-      print(mean_beta[1:6])
-      tide_res <- y_mod[!miss] - X %*% mean_beta
-    } else {
-      tide_res = y_mod[!miss]    # not really a tide residual in this case
-    }
+    tide_res = y_mod[!miss]    # not really a tide residual in this case
 
     s2 <- crossprod(tide_res,tide_res) #equation (14.7) in BDA book
     dim(s2) <- NULL
 
-    # Note that the terminology around scale and shape are possibly
-    # a bit odd in the harvey/trimbur paper and that the terms
-    # "rate" and "scale" are not standardized
-    prior_shape <- 100.*0.
-    prior_rate <- 1.5*prior_shape*0
-
-
-    #sigma2_eps_draw <- invgamma::rinvgamma(1,rate=s2/2.+prior_rate,shape=ngood/2.+prior_shape)
-    print(paste("s2",s2," s2/ngood=",s2/ngood," sigma2_eps_draw=",sigma2_eps_draw))
 
     eps_old <- sigma2_eps_draw
     eps_new <- eps_old + rnorm(1,mean=0,sd=mh_sd_eps)
@@ -232,7 +180,7 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
     }
     qzeta <- sigma2_zeta/eps_old
     qkappa <- sigma2_kappa/eps_old
-    cost_old <- filter_prior(test_freqs=testfreqs,test_targets=test_targets,scale=filter_scale,
+    cost_old <- filter_prior(filter_prior_freqs=testfreqs,test_targets=test_targets,scale=filter_scale,
                              sc_freq=sc_freq,m=order_trend,n=order_cycle,
                              rho=rho,qzeta=qzeta,qkappa=qkappa)
     qzeta <- sigma2_zeta/eps_new
@@ -251,25 +199,16 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
     }
     print("Epsilon")
     print(paste("sigma2_eps_old",eps_old,"sigma2_eps_new",eps_new))
-    print(paste("cost_new",cost_new,"cost_old",cost_old))
+    print(paste("prior-based cost_new",cost_new,"cost_old",cost_old))
     print(paste("sigma2_eps accepted: ",accept_eps))
-    print(paste("sigma2_eps=",sigma2_eps_draw," scale version:",s2/(nobs)))
+    print(paste("Current sigma2_eps=",sigma2_eps_draw," scale version:",s2/(nobs)))
 
     dlm::V(model) <- matrix(sigma2_eps_draw)
     sigma2_epsilon_save[itr] <- sigma2_eps_draw
 
-    # These betas are the regression parameters for the the time invariant tide,
-    # not the slope for the trend according to the Trimbur notation.
-    if (regress){
-      covar_beta <- sigma2_eps_draw*var_beta
-      beta_draw <- mvrnorm(1,mean_beta,covar_beta)
-      beta_draw_save[itr,] <- beta_draw
-      harmonic <- X %*% beta_draw
-      res_good <- ygood-harmonic
-    } else {
-      res_good <- ygood
-    }
+
     # Have to embed these back in the full size including missing data
+    res_good <- ygood
     res <- y # for size including missing data, don't care about y
     res [miss] <- NA
     res[!miss] <- res_good
@@ -279,18 +218,11 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
 
     alpha_draw <- dlm::dlmBSample(modFilt)
     alpha_draw <- alpha_draw[-1,]
+    m0_new <- alpha_draw[1,]
     state_part2 <-alpha_draw %*% t(model$FF)
     do_thinning <- (itr %% thin_rate) == 0
     if (do_thinning){
-      if(regress){
-        harmonic_full <- Xfull %*% mean_beta
-      }else{
-        harmonic_full <- 0.
-      }
-      reconstruct <- state_part2 + harmonic_full
-      if (regress_lmr){
-        reconstruct <- reconstruct+r_ylm
-      }
+      reconstruct <- state_part2
       print("finished state draw")
     }
 
@@ -316,7 +248,7 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
       }
       qzeta <- zeta_old/sigma2_eps_draw
       qkappa <- sigma2_kappa/sigma2_eps_draw
-      cost_old <- filter_prior(test_freqs=testfreqs,test_targets=test_targets,scale=filter_scale,
+      cost_old <- filter_prior(filter_prior_freqs=testfreqs,test_targets=test_targets,scale=filter_scale,
                           sc_freq=sc_freq,m=order_trend,n=order_cycle,
                           rho=rho,qzeta=qzeta,qkappa=qkappa)
       qzeta <- zeta_new/sigma2_eps_draw
@@ -350,17 +282,18 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
     # There is only one value of rho for all freqs
     rho_new <- rho_old + rnorm(1,mean=0,sd=mh_sd_rho)
     # These are simple prob bounds, not a prior like in other versions
-    rho_in_bounds <- ((rho_new >= 0.0) & (rho_new <= max_rho))
+    rho_in_bounds <- ((rho_new >= rho_low) & (rho_new <= rho_high))
 
     # Accumulates log probability for rho, which requires summing across all
     # Frequencies
     pold <- 0
     pnew <- 0
 
-
+    print("Kappa")
     for (jj in (1:n_freq)) {
       # each freq has its own variance
       freqs_sel <- freqs[jj]
+      freq_name <- names(freqs)[jj]
       covar_matrix_inv_sel <- covar_matrix_cycle_inv[[jj]]
       scale_kappa <- cal_shape_kappa(order_trend, order_cycle, jj, freqs_sel,
                                      rho_sel, covar_matrix_inv_sel,
@@ -386,7 +319,7 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
       qkappa <- kappa_new/sigma2_eps_draw
       cost_new <-filter_prior(testfreqs,test_targets,scale=filter_scale,
                               sc_freq,order_trend,order_cycle,rho,qzeta,qkappa)
-      print(paste("cost_old",cost_old,"cost_new",cost_new,"dense_kappa_old",dense_kappa_old,
+      print(paste("filter prior cost_old",cost_old,"cost_new",cost_new,"dense_kappa_old",dense_kappa_old,
                   "dense_kappa_new",dense_kappa_new))
 
       accept_ratio_kappa = exp(-cost_new + dense_kappa_new +cost_old - dense_kappa_old)
@@ -395,9 +328,9 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
       print(paste("accept ratio",accept_ratio_kappa))
       if (accept_kappa){
         sigma2_kappa[[jj]] <- kappa_new[[jj]]
-        accept_reject$kappa[1] <- accept_reject$kappa[1] + 1
+        accept_reject$kappa[[freq_name]][1] <- accept_reject$kappa[[freq_name]][1] + 1
       }else{
-        accept_reject$kappa[2] <- accept_reject$kappa[2] + 1
+        accept_reject$kappa[[freq_name]][2] <- accept_reject$kappa[[freq_name]][2] + 1
       }
 
       print(paste("accepted sigma2 in index",jj,accept_kappa))
@@ -407,16 +340,12 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
       sigma2_kappa_save[itr,jj] <- sigma2_kappa[[jj]]
       Wcycle <- c(Wcycle,rep(0,2*(order_cycle-1)),sigma2_kappa[[jj]],sigma2_kappa[[jj]])
 
-      if (rho_in_bounds){
+      if ((!rho_fixed) & rho_in_bounds){
         # covar_matrix_cycle only depends on rho and freq, so this is still
         # ok, unperturbed by work on zeta and eps
         covar_old<- covar_matrix_cycle[[jj]]
         covar_inv_old <- covar_matrix_cycle_inv[[jj]]
 
-        #arg_old <- cal_shape_kappa(order_trend, order_cycle, jj, freqs_sel,
-        #                               rho_old, covar_inv_old, nobs, alpha_draw)
-        #anydiff <- any(arg_old != scale_kappa)
-        #print(paste("Any diff ",anydiff))
         arg_old <- scale_kappa
         arg_old <- arg_old/sigma2_kappa[[jj]]
         pdivold <- 0.5*(determinant(sigma2_kappa[[jj]]*covar_old,
@@ -461,7 +390,7 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
     # Initialize with rho_old, assuming no step overwrite with rho_new if accepted
     rho <- rho_old    # This doesn't do anything, but it clarifies
     # If the new value is precluded by being out of bounds no action needed except to record it
-    if (rho_in_bounds){
+    if ((!rho_fixed) & rho_in_bounds){
       if (pnew >= pold){
         # ratio > 1, accept without transformations and random draw
         print(paste("rho: accept ratio >= 1, new rho = ",rho_new))
@@ -480,9 +409,15 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
         }
       } # pnew >= pold
     }else{
-      # rho: rejected step because the new row went outside bounds. This
-      # May be common initially if the start is near 1.0
-      print(paste("rho: reject b/c draw out of bounds (0,1)",rho_new,", retain ",rho_old))
+      # rho: rejected step because the new row went outside bounds or because it is fixed
+      if (rho_fixed){
+        rho <- rho_old
+        print(paste("rho fixed, retain",rho_old))
+      }else{
+        rho <-rho_old
+        print(paste("rho: reject b/c draw out of bounds (rho_low,rho_high)",
+                     rho_new,", retain ",rho_old))
+      }
     }
 
     if (rho != rho_old){
@@ -505,8 +440,15 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
       }
     }
 
-    print("Accept/reject matrix:")
-    print(accept_reject)
+    print("Accept/reject rates:")
+    print(paste("epsilon :",paste(accept_reject$eps,collapse=" ")))
+    print(paste("zeta: ",paste(accept_reject$zeta,collapse=" ")))
+    print(paste("rho",paste(accept_reject$rho,collapse=" ")))
+    for (jj in 1:n_freq){
+      freq_name <- names(freqs)[jj]
+      arrate <- accept_reject$kappa[[freq_name]]
+      print(paste("kappa[",freq_name,"]",paste(arrate,collapse=" ")))
+    }
     print("*")
 
 
@@ -519,7 +461,6 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
       print ("thinned")
       state_thinned <- rbind(state_thinned,t(reconstruct))
       subtide_thinned <-  rbind(subtide_thinned,t(alpha_draw[,1]))
-      harmonic_thinned <- rbind(harmonic_thinned,t(harmonic_full))
       for (jj in (1:n_freq)) {
         flabels <- names(freqs)
         label <- flabels[jj]
@@ -531,8 +472,6 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
         freq_thinned[[label]] <- rbind(freq_thinned[[label]],t(alpha_draw[,jndx]))
       }
     }
-
-
   }
 
   print (paste('Finish MCMC',date()))
@@ -540,8 +479,8 @@ sc_gibbs_filter_prior <- function(y,order_trend,order_cycle,
   return(list(beta=beta_draw_save,sigma2_epsilon=sigma2_epsilon_save,sigma2_zeta=sigma2_zeta_save,
               sigma2_kappa = sigma2_kappa_save,rho = rho_save,
               order_trend = order_trend, order_cycle = order_cycle, freqs = freqs,
-              state_thinned=state_thinned,lm1=r_lm1,
-              subtide_thinned = subtide_thinned, harmonic_thinned=harmonic_thinned,
+              state_thinned=state_thinned,
+              subtide_thinned = subtide_thinned,
               amplitude_thinned=amplitudes_thinned,
-              phase_thinned=phase_thinned,freq_thinned=freq_thinned))
+              phase_thinned=phase_thinned,freq_thinned=freq_thinned,accept_reject=accept_reject))
 }
