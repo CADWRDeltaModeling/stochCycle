@@ -14,3 +14,6 @@ Freeport:
 freeport_vmd has the vmd example 
 postprocessing python for plots is in the freeport_vmd directory: plot_freeport_phase for phase and plot_freeport_am for amplitude
 
+San Francisco (reference for phase):
+sf_noaa
+
