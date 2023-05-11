@@ -23,5 +23,6 @@ Imports:
 	  signal,
 	  yaml
 Suggests:
-    VMDComp
+    VMDComp,
+    colorednoise
 
