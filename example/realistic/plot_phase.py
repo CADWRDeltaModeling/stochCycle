@@ -235,8 +235,8 @@ def do():
             ax.indicate_inset_zoom(subax,edgecolor="black")
         
         
-    axes[1].legend(bbox_to_anchor=(0.7,2),loc="lower left")
-    axes[1].set_ylabel("Amplitude (degrees)")
+    #axes[1].legend(bbox_to_anchor=(0.7,2),loc="lower left")
+    axes[1].set_ylabel("Phase (degrees)")
     axes[1].set_xlim(0,3000./24)
     plt.tight_layout()
     

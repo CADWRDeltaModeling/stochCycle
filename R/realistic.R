@@ -59,21 +59,18 @@ realistic_tide <- function(plots=FALSE,csvfile=NULL,
 
   # two low frequency cycles and an interaction
   hrs_14d = 24*14.
-  hrs_180d = 24*60.
+  hrs_60d = 24*60.
   hrs_7d = 24*7
   hrs_5d = 24*5
 
 
-  d14 = 0.25*sin(2*pi*t/hrs_14d+pi)
-  d180 = 0.14*sin(2*pi*t/hrs_180d+pi)
+  d14 = 0.25*cos(2*pi*t/hrs_14d+pi/2)
+  d180 = 0.14*cos(2*pi*t/hrs_60d+pi/2)  # sin(x) = cos(x-pi/2)
   mix = 8.*d14*d180
   d7 = 0.6*cos(2*pi*t/hrs_7d)
   d5 = 0.75*(t/10000)*cos(2*pi*t/hrs_5d)
 
   R0 = 0.7+(y_0_base + d14 + d180 + d7 +d5)
-  R00 = 0.7+(y_0_base +d14+ d180 + d7)
-  ts.plot(R0)
-  lines(R00)
 
 
   d2 = cos(2*pi*t/12.5)

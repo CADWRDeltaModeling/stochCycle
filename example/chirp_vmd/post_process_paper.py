@@ -29,11 +29,15 @@ output.index.name="time"
 print(output.columns)
 print(vmd.columns)
 vmdcol='maroon'
+vmdcol='0.15'
 vmdline = '-.'
+col23 = 0.2
+col24 = 0.4
+analcol='maroon'
 
 fig,(ax0,ax1,ax2,ax3,ax4)=plt.subplots(5,1,sharex=True,figsize=(6,5.5))
 
-output.subtide_parm.plot(ax=ax0,label='Analytical',color='black')
+output.subtide_parm.plot(ax=ax0,label='Analytical',color=analcol,zorder=5)
 output.subtide_parm.plot(ax=ax0,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 ax0.fill_between(output.index,output.subtide25,output.subtide75,color='.8')
 if (n==3): vmd.subtide.plot(ax=ax0,label='VMD',color=vmdcol,linestyle=vmdline)
@@ -44,25 +48,25 @@ if (n==3): vmd.subtide.plot(ax=ax0,label='VMD',color=vmdcol,linestyle=vmdline)
 #output.subtide50(ax=ax0,label='Posterior 50 quantile')
 #output.subtide50(ax=ax0,label='Posterior 75 quantile')
 
-output.D1_amp.plot(ax=ax1,label='Analytical',color='black')
+output.D1_amp.plot(ax=ax1,label='Analytical',color=analcol,zorder=5)
 output.D1_amp_parm.plot(ax=ax1,label=f'SCHA({m},{n}) Mean Param',
                         color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 ax1.fill_between(output.index,output.D1_amp_25,output.D1_amp_75,color='.8')
 #if (n==3): vmd.D1_amp.plot(ax=ax1,label='VMD',color=vmdcol,linestyle=vmdline)
 
-output.D2_amp.plot(ax=ax2,label='Analytical',color='black')
+output.D2_amp.plot(ax=ax2,label='Analytical',color=analcol,zorder=5)
 output.D2_amp_parm.plot(ax=ax2,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 ax2.fill_between(output.index,output.D2_amp_25,output.D2_amp_75,color='.8')
 if (n==3): vmd.D2_amp.plot(ax=ax2,label='VMD',color=vmdcol,linestyle=vmdline)
 
 
-output.D3_amp.plot(ax=ax3,label='Analytical',color='black')
+output.D3_amp.plot(ax=ax3,label='Analytical',color=analcol,zorder=5)
 output.D3_amp_parm.plot(ax=ax3,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 ax3.fill_between(output.index,output.D3_amp_25,output.D3_amp_75,color='.8')
 if (n==3): vmd.D3_amp.plot(ax=ax3,label='VMD',color=vmdcol,linestyle=vmdline)
 
 
-output.D4_amp.plot(ax=ax4,label='Analytical',color='black')
+output.D4_amp.plot(ax=ax4,label='Analytical',color=analcol,zorder=5)
 output.D4_amp_parm.plot(ax=ax4,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 ax4.fill_between(output.index,output.D4_amp_25,output.D4_amp_75,color='.8')
 if (n==3): vmd.D4_amp.plot(ax=ax4,label='VMD',color=vmdcol,linestyle=vmdline)
@@ -87,7 +91,7 @@ plt.show()
 
 
 fig,(ax1,ax2,ax3,ax4)=plt.subplots(4,1,sharex=True,figsize=(7,5))
-(180.*output.D1_phase/np.pi).plot(ax=ax1,label='Analytical',color='black')
+(180.*output.D1_phase/np.pi).plot(ax=ax1,label='Analytical',color=analcol,zorder=5)
 (180.*output.D1_phase_parm/np.pi).plot(ax=ax1,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 if n==3:
     ax1.set_ylim(-10,45)
@@ -95,7 +99,7 @@ else:
     ax1.set_ylim(-10,45)
 
 print(vmd.columns)
-(180.*output.D2_phase/np.pi).plot(ax=ax2,label='Analytical',color='black')
+(180.*output.D2_phase/np.pi).plot(ax=ax2,label='Analytical',color=analcol,zorder=5)
 (180.*output.D2_phase_parm/np.pi).plot(ax=ax2,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 if (n==3): 
     (180.*vmd.D2_phase/np.pi).plot(ax=ax2,label=f'VMD',color=vmdcol,linestyle=vmdline)
@@ -103,7 +107,7 @@ if (n==3):
 else:
     ax4.set_ylim(0,25.)
 
-(180.*output.D3_phase/np.pi).plot(ax=ax3,label=f'Analytical',color='black')
+(180.*output.D3_phase/np.pi).plot(ax=ax3,label=f'Analytical',color=analcol,zorder=5)
 (180.*output.D3_phase_parm/np.pi).plot(ax=ax3,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 if (n==3): 
     (180.*vmd.D3_phase/np.pi).plot(ax=ax3,label=f'VMD',color=vmdcol,linestyle=vmdline)
@@ -111,7 +115,7 @@ if (n==3):
 else:
     ax4.set_ylim(0,50.)
 
-(180.*output.D4_phase/np.pi).plot(ax=ax4,label=f'Analytical',color='black')
+(180.*output.D4_phase/np.pi).plot(ax=ax4,label=f'Analytical',color=analcol,zorder=5)
 (180.*output.D4_phase_parm/np.pi).plot(ax=ax4,label=f'SCHA({m},{n}) Mean Param',color='0.4',markersize=5,markevery=markerspace,style=['-^'])
 if (n==3):  
     (180.*vmd.D4_phase/np.pi).plot(ax=ax4,label=f'VMD',color=vmdcol,linestyle=vmdline)
